@@ -1,20 +1,21 @@
-# Interstellar Attackers
-
 import pygame
 import random
 
-WIDTH = 1366
-HEIGHT = 768
-stars = []
-
 # pygame setup
 pygame.init()
-screen = pygame.display.set_mode((1366, 768))
+
+# Fullscreen mode setup
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # 0, 0 auto-adjusts to full screen
+WIDTH, HEIGHT = screen.get_width(), screen.get_height()  # Get the current screen size after fullscreen mode
+
+stars = []
+
+# Set up clock, running, and other variables
 clock = pygame.time.Clock()
 running = True
 dt = 0
 
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+player_pos = pygame.Vector2(WIDTH / 2, HEIGHT / 2)
 
 # Load the spaceship image once (outside the loop for efficiency)
 spaceship_image = pygame.image.load("spaceship.png")
@@ -68,11 +69,13 @@ while running:
     # WASD for movement
     keys = pygame.key.get_pressed()
 
-    # Determine movement direction
+    # Determine movement direction, with boundary checks
     if keys[pygame.K_w]:
-        player_pos.y -= 450 * dt
+        if player_pos.y > 0:  # Prevent going off the top
+            player_pos.y -= 450 * dt
     if keys[pygame.K_s]:
-        player_pos.y += 450 * dt
+        if player_pos.y < HEIGHT:  # Prevent going off the bottom
+            player_pos.y += 450 * dt
 
     # Determine banking direction
     if keys[pygame.K_a] and keys[pygame.K_d]:
@@ -85,11 +88,13 @@ while running:
             bank_angle = min(0, bank_angle)  # Avoid overshooting
     elif keys[pygame.K_a]:
         # Bank left
-        player_pos.x -= 450 * dt
+        if player_pos.x > 0:  # Prevent going off the left edge
+            player_pos.x -= 450 * dt
         bank_angle += bank_speed * dt
     elif keys[pygame.K_d]:
         # Bank right
-        player_pos.x += 450 * dt
+        if player_pos.x < WIDTH:  # Prevent going off the right edge
+            player_pos.x += 450 * dt
         bank_angle -= bank_speed * dt
     else:
         # Gradually return to neutral position when no A or D key is pressed
@@ -111,6 +116,17 @@ while running:
 
     # Adjust position to keep the rotation centered (avoid jitter)
     rotated_rect = rotated_spaceship.get_rect(center=(round(player_pos.x), round(player_pos.y)))
+
+    # Ensure spaceship stays within screen boundaries
+    # Prevent spaceship from going out of bounds
+    if rotated_rect.left < 0:
+        rotated_rect.left = 0
+    if rotated_rect.right > WIDTH:
+        rotated_rect.right = WIDTH
+    if rotated_rect.top < 0:
+        rotated_rect.top = 0
+    if rotated_rect.bottom > HEIGHT:
+        rotated_rect.bottom = HEIGHT
 
     # Draw the rotated spaceship
     screen.blit(rotated_spaceship, rotated_rect.topleft)
