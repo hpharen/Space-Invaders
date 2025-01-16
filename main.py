@@ -17,10 +17,10 @@ dt = 0
 player_pos = pygame.Vector2(WIDTH / 2, HEIGHT / 2)
 
 # Load the spaceship images once (outside of loop for efficiency)
-spaceship_image = pygame.image.load("spaceship_shadow.png")
-spaceship_fwd1 = pygame.image.load("spaceship_fwd1_shadow.png")
-spaceship_fwd2 = pygame.image.load("spaceship_fwd2_shadow.png")
-spaceship_fwd3 = pygame.image.load("spaceship_fwd3_shadow.png")
+spaceship_image = pygame.image.load("sprites/spaceship_shadow.png")
+spaceship_fwd1 = pygame.image.load("sprites/spaceship_fwd1_shadow.png")
+spaceship_fwd2 = pygame.image.load("sprites/spaceship_fwd2_shadow.png")
+spaceship_fwd3 = pygame.image.load("sprites/spaceship_fwd3_shadow.png")
 
 # Scale the images to match the desired size
 spaceship_image = pygame.transform.scale(spaceship_image, (100, 100))
