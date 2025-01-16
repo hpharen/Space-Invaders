@@ -8,8 +8,6 @@ pygame.init()
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # 0, 0 auto-adjusts to full screen
 WIDTH, HEIGHT = screen.get_width(), screen.get_height()  # Get the current screen size after fullscreen mode
 
-stars = []
-
 # Set up clock, running, and other variables
 clock = pygame.time.Clock()
 running = True
@@ -17,15 +15,18 @@ dt = 0
 
 player_pos = pygame.Vector2(WIDTH / 2, HEIGHT / 2)
 
-# Load the spaceship image once (outside the loop for efficiency)
+# Load the spaceship images once (outside the loop for efficiency)
 spaceship_image = pygame.image.load("spaceship.png")
 spaceship_image = pygame.transform.scale(spaceship_image, (100, 100))
+spaceship_fwd_image = pygame.image.load("spaceship_fwd.png")
+spaceship_fwd_image = pygame.transform.scale(spaceship_fwd_image, (128, 128))
 
 # Banking variables
 bank_angle = 0  # Current bank angle
-bank_speed = 200  # Speed of banking in degrees per second
+bank_speed = 300  # Speed of banking in degrees per second
 max_bank_angle = 20  # Maximum tilt angle for banking
 
+stars = []
 yspeed = 8
 x = 1
 y = 1
@@ -69,10 +70,17 @@ while running:
     # WASD for movement
     keys = pygame.key.get_pressed()
 
+    # Set the spaceship image depending on the W key
+    if keys[pygame.K_w]:
+        current_spaceship_image = spaceship_fwd_image  # Use forward-facing spaceship image when W is pressed
+    else:
+        current_spaceship_image = spaceship_image  # Use default spaceship image when W is not pressed
+
+
     # Determine movement direction, with boundary checks
     if keys[pygame.K_w]:
         if player_pos.y > 0:  # Prevent going off the top
-            player_pos.y -= 450 * dt
+            player_pos.y -= 525 * dt
     if keys[pygame.K_s]:
         if player_pos.y < HEIGHT:  # Prevent going off the bottom
             player_pos.y += 450 * dt
@@ -112,7 +120,8 @@ while running:
     bank_angle = max(-max_bank_angle, min(max_bank_angle, bank_angle))
 
     # Rotate the spaceship image for banking effect
-    rotated_spaceship = pygame.transform.rotate(spaceship_image, bank_angle)
+    rotated_spaceship = pygame.transform.rotate(current_spaceship_image, bank_angle)
+
 
     # Adjust position to keep the rotation centered (avoid jitter)
     rotated_rect = rotated_spaceship.get_rect(center=(round(player_pos.x), round(player_pos.y)))
