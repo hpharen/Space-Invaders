@@ -1,6 +1,11 @@
 # Interstellar Attackers
 
 import pygame
+import random
+
+WIDTH = 1366
+HEIGHT = 768
+stars = []
 
 # pygame setup
 pygame.init()
@@ -20,6 +25,33 @@ bank_angle = 0  # Current bank angle
 bank_speed = 200  # Speed of banking in degrees per second
 max_bank_angle = 20  # Maximum tilt angle for banking
 
+yspeed = 8
+x = 1
+y = 1
+
+class Star(object):
+    def __init__(self, x, y, yspeed):
+        self.colour = (255, 255, 255)
+        self.radius = 2
+        self.x = x
+        self.y = y
+        self.yspeed = yspeed
+
+    def draw(self):
+        pygame.draw.circle(screen, self.colour, (self.x, self.y), self.radius)
+
+    def fall(self):
+        self.y += self.yspeed
+
+    def check_if_i_should_reappear_on_top(self):
+        if self.y >= HEIGHT:
+            self.y = 0
+
+for i in range(100):
+    x = random.randint(1, WIDTH - 1)
+    y = random.randint(1, HEIGHT - 1)
+    stars.append(Star(x, y, yspeed))
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -27,6 +59,11 @@ while running:
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("black")
+
+    for star in stars:
+        star.draw()
+        star.fall()
+        star.check_if_i_should_reappear_on_top()
 
     # WASD for movement
     keys = pygame.key.get_pressed()
