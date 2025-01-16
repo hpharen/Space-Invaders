@@ -17,15 +17,29 @@ dt = 0
 player_pos = pygame.Vector2(WIDTH / 2, HEIGHT / 2)
 
 # Load the spaceship images once (outside of loop for efficiency)
-spaceship_image = pygame.image.load("spaceship.png")
+spaceship_image = pygame.image.load("spaceship_shadow.png")
+spaceship_fwd1 = pygame.image.load("spaceship_fwd1_shadow.png")
+spaceship_fwd2 = pygame.image.load("spaceship_fwd2_shadow.png")
+spaceship_fwd3 = pygame.image.load("spaceship_fwd3_shadow.png")
+
+# Scale the images to match the desired size
 spaceship_image = pygame.transform.scale(spaceship_image, (100, 100))
-spaceship_fwd_image = pygame.image.load("spaceship_fwd.png")
-spaceship_fwd_image = pygame.transform.scale(spaceship_fwd_image, (128, 128))
+spaceship_fwd1 = pygame.transform.scale(spaceship_fwd1, (128, 128))
+spaceship_fwd2 = pygame.transform.scale(spaceship_fwd2, (128, 128))
+spaceship_fwd3 = pygame.transform.scale(spaceship_fwd3, (128, 128))
+
+# Store them in a list for easier cycling
+spaceship_fwd_images = [spaceship_fwd1, spaceship_fwd2, spaceship_fwd3]
 
 # Banking variables
 bank_angle = 0  # Current bank angle
 bank_speed = 300  # Speed of banking in degrees per second
 max_bank_angle = 20  # Maximum tilt angle for banking
+
+# Animation control variables
+fwd_index = 0  # Index to cycle through forward spaceship images
+animation_timer = 0  # Timer to control the speed of animation change
+animation_speed = 0.07  # Time in seconds between image swaps
 
 stars = []
 yspeed = 8
@@ -73,10 +87,14 @@ while running:
 
     # Set the spaceship image depending on the W key
     if keys[pygame.K_w]:
-        current_spaceship_image = spaceship_fwd_image  # Use forward-facing spaceship image when W is pressed
+        # Cycle through forward images while W is pressed
+        animation_timer += dt
+        if animation_timer >= animation_speed:
+            fwd_index = (fwd_index + 1) % len(spaceship_fwd_images)
+            animation_timer = 0
+        current_spaceship_image = spaceship_fwd_images[fwd_index]  # Use forward-facing spaceship image
     else:
         current_spaceship_image = spaceship_image  # Use default spaceship image when W is not pressed
-
 
     # Determine movement direction, with boundary checks
     if keys[pygame.K_w]:
@@ -122,7 +140,6 @@ while running:
 
     # Rotate the spaceship image for banking effect
     rotated_spaceship = pygame.transform.rotate(current_spaceship_image, bank_angle)
-
 
     # Adjust position to keep the rotation centered (avoid jitter)
     rotated_rect = rotated_spaceship.get_rect(center=(round(player_pos.x), round(player_pos.y)))
