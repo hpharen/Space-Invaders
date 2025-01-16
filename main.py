@@ -1,21 +1,22 @@
 import pygame
 import random
 
-# pygame setup
+# Initialize pygame
 pygame.init()
 
 # Fullscreen mode setup
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # 0, 0 auto-adjusts to full screen
 WIDTH, HEIGHT = screen.get_width(), screen.get_height()  # Get the current screen size after fullscreen mode
 
-# Set up clock, running, and other variables
+# Set up clock, running, delta time
 clock = pygame.time.Clock()
 running = True
 dt = 0
 
+# Player in game position
 player_pos = pygame.Vector2(WIDTH / 2, HEIGHT / 2)
 
-# Load the spaceship images once (outside the loop for efficiency)
+# Load the spaceship images once (outside of loop for efficiency)
 spaceship_image = pygame.image.load("spaceship.png")
 spaceship_image = pygame.transform.scale(spaceship_image, (100, 100))
 spaceship_fwd_image = pygame.image.load("spaceship_fwd.png")
@@ -83,7 +84,7 @@ while running:
             player_pos.y -= 525 * dt
     if keys[pygame.K_s]:
         if player_pos.y < HEIGHT:  # Prevent going off the bottom
-            player_pos.y += 450 * dt
+            player_pos.y += 400 * dt
 
     # Determine banking direction
     if keys[pygame.K_a] and keys[pygame.K_d]:
@@ -97,12 +98,12 @@ while running:
     elif keys[pygame.K_a]:
         # Bank left
         if player_pos.x > 0:  # Prevent going off the left edge
-            player_pos.x -= 450 * dt
+            player_pos.x -= 400 * dt
         bank_angle += bank_speed * dt
     elif keys[pygame.K_d]:
         # Bank right
         if player_pos.x < WIDTH:  # Prevent going off the right edge
-            player_pos.x += 450 * dt
+            player_pos.x += 400 * dt
         bank_angle -= bank_speed * dt
     else:
         # Gradually return to neutral position when no A or D key is pressed
