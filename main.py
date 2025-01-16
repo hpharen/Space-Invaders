@@ -3,7 +3,7 @@ import random
 
 # Initialize pygame
 pygame.init()
-
+#TEST
 # Fullscreen mode setup
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # 0, 0 auto-adjusts to full screen
 WIDTH, HEIGHT = screen.get_width(), screen.get_height()  # Get the current screen size after fullscreen mode
