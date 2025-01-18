@@ -50,7 +50,7 @@ animation_timer = 0 # Timer to control the speed of animation change
 animation_speed = 0.07  # Time in seconds between image swaps
 
 # Initialize stars
-star_manager = stars.StarManager(WIDTH, HEIGHT, num_stars=160, yspeed=12)
+star_manager = stars.StarManager(WIDTH, HEIGHT, num_stars=200, yspeed=12)
 
 # Spacebar state
 spacebar_pressed = False
