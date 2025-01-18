@@ -13,7 +13,7 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # 0, 0 auto-adjusts
 WIDTH, HEIGHT = screen.get_width(), screen.get_height()  # Get the current screen size after fullscreen mode
 
 # Initialize Fader
-fader = fade.Fader(WIDTH, HEIGHT, fade_speed=300)
+fader = fade.Fader(WIDTH, HEIGHT, fade_speed=90)
 fader.start_fade_in()  # Trigger fade-in at the start of the game
 
 # Set up clock, running, delta time
@@ -32,9 +32,9 @@ spaceship_fwd3 = pygame.image.load("sprites/spaceship_fwd3_shadow.png")
 
 # Scale the images to match the desired size
 spaceship_image = pygame.transform.scale(spaceship_image, (90, 90))
-spaceship_fwd1 = pygame.transform.scale(spaceship_fwd1, (118, 118))
-spaceship_fwd2 = pygame.transform.scale(spaceship_fwd2, (118, 118))
-spaceship_fwd3 = pygame.transform.scale(spaceship_fwd3, (118, 118))
+spaceship_fwd1 = pygame.transform.scale(spaceship_fwd1, (112, 112))
+spaceship_fwd2 = pygame.transform.scale(spaceship_fwd2, (112, 112))
+spaceship_fwd3 = pygame.transform.scale(spaceship_fwd3, (112, 112))
 
 # Store them in a list for easier cycling
 spaceship_fwd_images = [spaceship_fwd1, spaceship_fwd2, spaceship_fwd3]
@@ -42,18 +42,22 @@ spaceship_fwd_images = [spaceship_fwd1, spaceship_fwd2, spaceship_fwd3]
 # Banking variables
 bank_angle = 0  # Current bank angle
 bank_speed = 300  # Speed of banking in degrees per second
-max_bank_angle = 20  # Maximum tilt angle for banking
+max_bank_angle = 10  # Maximum tilt angle for banking
 
 # Animation control variables
 fwd_index = 0  # Index to cycle through forward spaceship images
-animation_timer = 0  # Timer to control the speed of animation change
+animation_timer = 0 # Timer to control the speed of animation change
 animation_speed = 0.07  # Time in seconds between image swaps
 
 # Initialize stars
-star_manager = stars.StarManager(WIDTH, HEIGHT, num_stars=160, yspeed=14)
+star_manager = stars.StarManager(WIDTH, HEIGHT, num_stars=160, yspeed=12)
 
 # Spacebar state
 spacebar_pressed = False
+
+# Initialize animation timer and spacebar state
+animation_timer = 0  # Initialize timer for animation
+spacebar_pressed = False  # Track spacebar press state
 
 while running:
     for event in pygame.event.get():
@@ -68,8 +72,8 @@ while running:
         running = False
 
     # Handle controls and movement via the controls module
-    player_pos, fwd_index, current_spaceship_image, bank_angle, spacebar_pressed = controls.handle_controls(
-        keys, player_pos, dt, spaceship_image, spaceship_fwd_images, fwd_index, bank_angle, bank_speed, max_bank_angle, WIDTH, HEIGHT, spacebar_pressed
+    player_pos, fwd_index, current_spaceship_image, bank_angle, spacebar_pressed, animation_timer = controls.handle_controls(
+        keys, player_pos, dt, spaceship_image, spaceship_fwd_images, fwd_index, bank_angle, bank_speed, max_bank_angle, WIDTH, HEIGHT, spacebar_pressed, animation_timer
     )
 
     # fill the screen with a color to wipe away anything from last frame

@@ -1,18 +1,15 @@
 import pygame
 import laser
 
-def handle_controls(keys, player_pos, dt, spaceship_image, spaceship_fwd_images, spaceship_fwd_index, bank_angle, bank_speed, max_bank_angle, WIDTH, HEIGHT, spacebar_pressed):
+def handle_controls(keys, player_pos, dt, spaceship_image, spaceship_fwd_images, fwd_index, bank_angle, bank_speed, max_bank_angle, width, height, spacebar_pressed, animation_timer):
     # Animation control variables
-    fwd_index = spaceship_fwd_index  # Index to cycle through forward spaceship images
-    animation_timer = 0  # Timer to control the speed of animation change
     animation_speed = 0.07  # Time in seconds between image swaps
 
     # Handle spacebar press for firing laser
-    if keys[pygame.K_SPACE]:
-        if not spacebar_pressed:  # Fire laser only if the spacebar was not already pressed
-            laser.fire_laser(player_pos.x, player_pos.y - 50)
-            spacebar_pressed = True  # Set flag to prevent further firing until released
-    else:
+    if keys[pygame.K_SPACE] and not spacebar_pressed:  # Fire laser only if the spacebar is not already pressed
+        laser.fire_laser(player_pos.x, player_pos.y - 50)
+        spacebar_pressed = True  # Set flag to prevent further firing until released
+    elif not keys[pygame.K_SPACE]:
         spacebar_pressed = False  # Reset flag when spacebar is released
 
     # Set the spaceship image depending on the W key
@@ -29,10 +26,10 @@ def handle_controls(keys, player_pos, dt, spaceship_image, spaceship_fwd_images,
     # Determine movement direction, with boundary checks
     if keys[pygame.K_w]:
         if player_pos.y > 0:  # Prevent going off the top
-            player_pos.y -= 625 * dt
+            player_pos.y -= 525 * dt
     if keys[pygame.K_s]:
-        if player_pos.y < HEIGHT:  # Prevent going off the bottom
-            player_pos.y += 500 * dt
+        if player_pos.y < height:  # Prevent going off the bottom
+            player_pos.y += 400 * dt
 
     # Determine banking direction
     if keys[pygame.K_a] and keys[pygame.K_d]:
@@ -46,12 +43,12 @@ def handle_controls(keys, player_pos, dt, spaceship_image, spaceship_fwd_images,
     elif keys[pygame.K_a]:
         # Bank left
         if player_pos.x > 0:  # Prevent going off the left edge
-            player_pos.x -= 500 * dt
+            player_pos.x -= 400 * dt
         bank_angle += bank_speed * dt
     elif keys[pygame.K_d]:
         # Bank right
-        if player_pos.x < WIDTH:  # Prevent going off the right edge
-            player_pos.x += 500 * dt
+        if player_pos.x < width:  # Prevent going off the right edge
+            player_pos.x += 400 * dt
         bank_angle -= bank_speed * dt
     else:
         # Gradually return to neutral position when no A or D key is pressed
@@ -65,4 +62,4 @@ def handle_controls(keys, player_pos, dt, spaceship_image, spaceship_fwd_images,
     # Clamp the bank angle to the maximum limits
     bank_angle = max(-max_bank_angle, min(max_bank_angle, bank_angle))
 
-    return player_pos, fwd_index, current_spaceship_image, bank_angle, spacebar_pressed
+    return player_pos, fwd_index, current_spaceship_image, bank_angle, spacebar_pressed, animation_timer
