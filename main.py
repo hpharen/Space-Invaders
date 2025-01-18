@@ -1,5 +1,9 @@
 import pygame
 import random
+import laser
+import stars
+import fade
+import controls  # Import the controls module
 
 # Initialize pygame
 pygame.init()
@@ -7,6 +11,10 @@ pygame.init()
 # Fullscreen mode setup
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # 0, 0 auto-adjusts to full screen
 WIDTH, HEIGHT = screen.get_width(), screen.get_height()  # Get the current screen size after fullscreen mode
+
+# Initialize Fader
+fader = fade.Fader(WIDTH, HEIGHT, fade_speed=300)
+fader.start_fade_in()  # Trigger fade-in at the start of the game
 
 # Set up clock, running, delta time
 clock = pygame.time.Clock()
@@ -23,10 +31,10 @@ spaceship_fwd2 = pygame.image.load("sprites/spaceship_fwd2_shadow.png")
 spaceship_fwd3 = pygame.image.load("sprites/spaceship_fwd3_shadow.png")
 
 # Scale the images to match the desired size
-spaceship_image = pygame.transform.scale(spaceship_image, (100, 100))
-spaceship_fwd1 = pygame.transform.scale(spaceship_fwd1, (128, 128))
-spaceship_fwd2 = pygame.transform.scale(spaceship_fwd2, (128, 128))
-spaceship_fwd3 = pygame.transform.scale(spaceship_fwd3, (128, 128))
+spaceship_image = pygame.transform.scale(spaceship_image, (90, 90))
+spaceship_fwd1 = pygame.transform.scale(spaceship_fwd1, (118, 118))
+spaceship_fwd2 = pygame.transform.scale(spaceship_fwd2, (118, 118))
+spaceship_fwd3 = pygame.transform.scale(spaceship_fwd3, (118, 118))
 
 # Store them in a list for easier cycling
 spaceship_fwd_images = [spaceship_fwd1, spaceship_fwd2, spaceship_fwd3]
@@ -41,111 +49,47 @@ fwd_index = 0  # Index to cycle through forward spaceship images
 animation_timer = 0  # Timer to control the speed of animation change
 animation_speed = 0.07  # Time in seconds between image swaps
 
-stars = []
-yspeed = 8
-x = 1
-y = 1
+# Initialize stars
+star_manager = stars.StarManager(WIDTH, HEIGHT, num_stars=160, yspeed=14)
 
-class Star(object):
-    def __init__(self, x, y, yspeed):
-        self.colour = (255, 255, 255)
-        self.radius = 2
-        self.x = x
-        self.y = y
-        self.yspeed = yspeed
-
-    def draw(self):
-        pygame.draw.circle(screen, self.colour, (self.x, self.y), self.radius)
-
-    def fall(self):
-        self.y += self.yspeed
-
-    def check_if_i_should_reappear_on_top(self):
-        if self.y >= HEIGHT:
-            self.y = 0
-
-for i in range(100):
-    x = random.randint(1, WIDTH - 1)
-    y = random.randint(1, HEIGHT - 1)
-    stars.append(Star(x, y, yspeed))
+# Spacebar state
+spacebar_pressed = False
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+    # WASD for movement and other key events
+    keys = pygame.key.get_pressed()
+
+    # Escape key handling (quit the game)
+    if keys[pygame.K_ESCAPE]:
+        running = False
+
+    # Handle controls and movement via the controls module
+    player_pos, fwd_index, current_spaceship_image, bank_angle, spacebar_pressed = controls.handle_controls(
+        keys, player_pos, dt, spaceship_image, spaceship_fwd_images, fwd_index, bank_angle, bank_speed, max_bank_angle, WIDTH, HEIGHT, spacebar_pressed
+    )
+
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("black")
 
-    for star in stars:
-        star.draw()
-        star.fall()
-        star.check_if_i_should_reappear_on_top()
+    # Update and draw stars
+    star_manager.update_and_draw(screen)
 
-    # WASD for movement
-    keys = pygame.key.get_pressed()
+    # Update and draw lasers
+    laser.update_lasers(dt, screen, WIDTH, HEIGHT)
 
-    # Set the spaceship image depending on the W key
-    if keys[pygame.K_w]:
-        # Cycle through forward images while W is pressed
-        animation_timer += dt
-        if animation_timer >= animation_speed:
-            fwd_index = (fwd_index + 1) % len(spaceship_fwd_images)
-            animation_timer = 0
-        current_spaceship_image = spaceship_fwd_images[fwd_index]  # Use forward-facing spaceship image
-    else:
-        current_spaceship_image = spaceship_image  # Use default spaceship image when W is not pressed
+    # Handle fade-in effect
+    fader_active = fader.update(dt)  # Update fade and check if still active
+    fader.draw(screen)  # Draw the fade effect on top of the screen
 
-    # Determine movement direction, with boundary checks
-    if keys[pygame.K_w]:
-        if player_pos.y > 0:  # Prevent going off the top
-            player_pos.y -= 525 * dt
-    if keys[pygame.K_s]:
-        if player_pos.y < HEIGHT:  # Prevent going off the bottom
-            player_pos.y += 400 * dt
-
-    # Determine banking direction
-    if keys[pygame.K_a] and keys[pygame.K_d]:
-        # Neutral banking if both A and D are pressed
-        if bank_angle > 0:
-            bank_angle -= bank_speed * dt
-            bank_angle = max(0, bank_angle)  # Avoid overshooting
-        elif bank_angle < 0:
-            bank_angle += bank_speed * dt
-            bank_angle = min(0, bank_angle)  # Avoid overshooting
-    elif keys[pygame.K_a]:
-        # Bank left
-        if player_pos.x > 0:  # Prevent going off the left edge
-            player_pos.x -= 400 * dt
-        bank_angle += bank_speed * dt
-    elif keys[pygame.K_d]:
-        # Bank right
-        if player_pos.x < WIDTH:  # Prevent going off the right edge
-            player_pos.x += 400 * dt
-        bank_angle -= bank_speed * dt
-    else:
-        # Gradually return to neutral position when no A or D key is pressed
-        if bank_angle > 0:
-            bank_angle -= bank_speed * dt
-            bank_angle = max(0, bank_angle)  # Avoid overshooting
-        elif bank_angle < 0:
-            bank_angle += bank_speed * dt
-            bank_angle = min(0, bank_angle)  # Avoid overshooting
-
-    if keys[pygame.K_ESCAPE]:
-        break
-
-    # Clamp the bank angle to the maximum limits
-    bank_angle = max(-max_bank_angle, min(max_bank_angle, bank_angle))
-
-    # Rotate the spaceship image for banking effect
+    # Draw the spaceship
     rotated_spaceship = pygame.transform.rotate(current_spaceship_image, bank_angle)
-
-    # Adjust position to keep the rotation centered (avoid jitter)
     rotated_rect = rotated_spaceship.get_rect(center=(round(player_pos.x), round(player_pos.y)))
 
     # Ensure spaceship stays within screen boundaries
-    # Prevent spaceship from going out of bounds
     if rotated_rect.left < 0:
         rotated_rect.left = 0
     if rotated_rect.right > WIDTH:
