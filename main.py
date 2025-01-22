@@ -3,7 +3,8 @@ import random
 import laser
 import stars
 import fade
-import controls  # Import the controls module
+import controls
+import alien
 
 # Initialize pygame
 pygame.init()
@@ -15,6 +16,9 @@ WIDTH, HEIGHT = screen.get_width(), screen.get_height()  # Get the current scree
 # Initialize Fader
 fader = fade.Fader(WIDTH, HEIGHT, fade_speed=90)
 fader.start_fade_in()  # Trigger fade-in at the start of the game
+
+# Initialize alien grid
+alien_grid = alien.AlienGrid()
 
 # Set up clock, running, delta time
 clock = pygame.time.Clock()
@@ -88,6 +92,9 @@ while running:
     # Handle fade-in effect
     fader_active = fader.update(dt)  # Update fade and check if still active
     fader.draw(screen)  # Draw the fade effect on top of the screen
+
+    # Draw the aliens
+    alien_grid.draw(screen)
 
     # Draw the spaceship
     rotated_spaceship = pygame.transform.rotate(current_spaceship_image, bank_angle)
