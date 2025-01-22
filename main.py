@@ -18,7 +18,7 @@ fader = fade.Fader(WIDTH, HEIGHT, fade_speed=90)
 fader.start_fade_in()  # Trigger fade-in at the start of the game
 
 # Initialize alien grid
-alien_grid = alien.AlienGrid()
+alien_grid = alien.AlienGrid(WIDTH)
 
 # Set up clock, running, delta time
 clock = pygame.time.Clock()

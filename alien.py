@@ -10,10 +10,11 @@ class Alien:
         screen.blit(self.image, self.rect.topleft)
 
 class AlienGrid:
-    def __init__(self, rows=3, cols=8, spacing=20):
+    def __init__(self, screen_width, rows=3, cols=8, spacing=20):
         self.aliens = []
         alien_images = ["sprites/alien1.png", "sprites/alien2.png", "sprites/alien3.png"]
-        start_x, start_y = 100, 100  # Starting position of the alien grid
+        start_x = (screen_width - (cols * (80 + spacing) - spacing)) // 2  # Center the grid horizontally
+        start_y = 50  # Spawn at the top of the screen
         
         for row in range(rows):
             for col in range(cols):
